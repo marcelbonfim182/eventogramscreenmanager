@@ -1,0 +1,151 @@
+
+
+<div data-role="view" data-title="Home" data-layout="main" data-model="APP.models.home">
+   
+    
+   <div class="container" style="height:520px;">
+		<div data-force="30" class="layer block" style="float: left;width: 47%; margin-left: 2%">
+			<div class="layer title">PERFIS BLOQUEADOS</div>
+			<ul id="foo" class="block__list block__list_words">
+
+			</ul>
+		</div>
+
+		<div data-force="18" class="layer block" style="float: right;width: 47%; margin-right: 2%">
+			<div class="layer title">PERFIS LIBERADOS</div>
+			<ul id="bar" class="block__list block__list_words">
+				
+			</ul>
+		</div>
+       
+       
+	</div>
+    <div data-role="modalview" id="modalview-login"  class="anakmaia" style="width: 90%;">
+    <div data-role="header">
+        <div data-role="navbar">
+            <span>PERFIL</span>
+            <a data-click="closeModalViewLogin" data-role="button" data-align="right">Fechar</a>
+            <a data-click="carregarperfil" data-role="button" data-align="right">Carregar perfil?</a>
+        </div>
+    </div>
+        
+        
+
+  <div id="widget" style="height:250px;width:300px; margin:0 auto; display:table;">
+      
+  </div>
+      
+</div>
+    
+    
+  
+    
+  <iframe src="http://www.mesmeracomunicacao.com.br/eventogram/index_compact.html" id="atualizarxmlnosite" style="display:none;"></iframe>
+    
+    <input type="text" id="campo1" style="display:none;" />
+   
+    <script src="scripts/Sortable.min.js"></script>
+	<script src="scripts/Ply.min.js"></script>
+
+	<script>
+        iniciaajax();
+        
+		(function (){
+	
+
+			new Sortable(foo, {
+				group: "words",
+				store: {
+					get: function (sortable) {
+						var order = localStorage.getItem(sortable.options.group);
+						return order ? order.split("|") : [];
+					},
+					set: function (sortable) {
+						var order = sortable.toArray();
+						localStorage.setItem(sortable.options.group, order.join('|'));
+					}
+				},
+				onAdd: function (evt){ console.log("onAdd.foo:", evt.item); },
+				onUpdate: function (evt){ console.log("onUpdate.foo:", evt.item); },
+				onRemove: function (evt){  },
+				onStart:function(evt){ console.log("onStart.foo:",evt.item);},
+				onEnd: function(evt){ console.log("onEnd.foo:", evt.item);},
+                onFilter: function(evt){ alert("teste"); }
+                
+			});
+
+
+			new Sortable(bar, {
+				group: "words",
+			    onAdd: function (evt){ gravalistabranca(); modalspinner_ligado(); },
+				onUpdate: function (evt){ console.log("onUpdate.foo:", evt.item); },
+				onRemove: function (evt){ gravalistabranca(); modalspinner_ligado(); },
+				onStart:function(evt){ console.log("onStart.foo:",evt.item);},
+				onEnd: function(evt){ console.log("onEnd.foo:", evt.item);},
+                onFilter: function(evt){ alert("teste");}
+			});
+
+		})();
+	
+	</script>
+     
+    <script>
+    function gravalistabranca(){
+        
+         var iframe = document.getElementById("atualizarxmlnosite");
+          iframe.src = iframe.src;
+        
+         	//CAPTURA DADOS DO INSTAGRAM DA ID=photos-Wrap E JOGA NO CAMPO
+ 
+	 dadosparatxt ='';
+     $("#bar li input").each(function() {
+         dadosparatxt += $(this).val();
+     }); 
+
+    //alert(dadosparatxt);
+	
+	 $('#campo1').val('<?xml version="1.0" encoding="utf-8"?><Pages>' + dadosparatxt +' </Pages>');
+        
+        $.ajax({
+           
+            type      : 'post',
+ 
+            url       : 'http://www.mesmeracomunicacao.com.br/eventogram/gerarxml_listabranca.php',
+ 
+            data      : 'nome='+ $('#campo1').val(),
+ 
+            dataType  : 'html',
+ 
+            success : function(txt){
+                    $('body p').html(txt);
+                 
+                },
+	
+	    complete: function() {
+         
+         modalspinner_desligado()
+		}
+        });
+     };
+ </script>
+    <script>
+    function closeModalViewLogin() {
+        $("#modalview-login").kendoMobileModalView("close");
+    }
+        
+     function carregarperfil() {
+        $("#modalview-login").kendoMobileModalView("close");
+    }
+     
+        function carregarperfil() {
+         $("#widget").ProfileWidget({
+			username: "anakmaia",
+			clientID: "4f98fd5117e640959efcc8169e23ad45"
+		});
+    }   
+
+</script>
+    
+</div>
+    
+

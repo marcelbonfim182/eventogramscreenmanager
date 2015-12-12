@@ -1,3 +1,263 @@
-<div data-role="view" data-title="Home" data-layout="main" data-model="APP.models.home">
-  <h1 data-bind="html: title"></h1>
+
+
+<div data-role="view" data-title="Home" data-layout="main" data-init="initPullToRefreshScroller" data-model="APP.models.home" id="content" style="height:100%!important;display:table;" >
+   <script>
+        function iniciasortable(){
+            
+                $( "#foo, #bar" ).sortable({
+                  connectWith: ".connectedSortable"
+                }).disableSelection();
+                 
+             
+            };
+      
+    
+       $( ".connectedSortable" ).sortable({
+          receive: function( event, ui ) {gravalistabranca(); modalspinner_ligado();}
+        });
+       
+       
+       
+       
+        $("#bar, #foo").on("click", "li", function(){
+         
+         $("#modal-info").empty();
+       
+         var pegaid = $(this).attr("id");
+           
+         $("#modal-info").append( "<div class='"+pegaid+"  instagramwidget_inside'></div>" );
+           
+         $("."+pegaid).ProfileWidget({
+			username: pegaid,
+			clientID: "4f98fd5117e640959efcc8169e23ad45"
+		});
+          $("#modal").addClass("modalaparece");
+        });
+       
+       
+       
+       $("#closemodal").on("click", function(){
+           $("#modal").removeClass("modalaparece");
+           });
+      
+     </script>
+    
+
+       <div id="modal" class="modal">
+       
+       <div id="modal-content" class="modal-content">
+           <div id="modal-info" class="modal-info"></div>
+           
+           <div class="cf footer">
+				<a data-role="button" data-rel="modalview" href="#teste" class="btn" id="closemodal">Fechar</a>
+			</div>
+       </div>
+       <div class="overlay"></div>
+   </div>
+    
+    
+   <div data-role="scroller" id="container" class="container" style="height:100%!important;display:table;" >
+		<div data-force="30" class="layer block" style="float: left;width: 47%; margin-left: 2%; height:100%!important;display:table;">
+			<div class="layer title">PERFIS BLOQUEADOS</div>
+			<ul id="foo" class="connectedSortable" style="height:100%!important;min-height:300px;display:table;border:1px solid #000;width:100%">
+
+			</ul>
+		</div>
+
+		<div data-force="18" class="layer block" style="float: right;width: 47%; margin-right: 2%; height:100%!important;display:table;">
+			<div class="layer title">PERFIS LIBERADOS</div>
+			<ul id="bar" class="connectedSortable" style="height:100%!important;min-height:300px;display:table;border:1px solid #000;width:100%">
+				
+			</ul>
+		</div>
+       
+       
+	</div>
+    <div data-role="modalview" id="modalview-login" style="width: 90%;">
+    <div data-role="header">
+        <div data-role="navbar">
+            <span>PERFIL</span>
+            <a data-click="closeModalViewLogin" data-role="button" data-align="right">Fechar</a>
+            <a data-click="carregarperfil" data-role="button" data-align="right">Carregar perfil?</a>
+        </div>
+    </div>
+        
+        
+
+
+      
 </div>
+    
+    
+  
+    
+  <iframe src="http://www.mesmeracomunicacao.com.br/eventogram/index_compact.html" id="atualizarxmlnosite" style="display:none;"></iframe>
+    
+    <input type="text" id="campo1" style="display:none;" />
+   
+
+
+	<script>
+        iniciaajax();
+       
+	
+	</script>
+     
+    <script>
+    function gravalistabranca(){
+        
+         var iframe = document.getElementById("atualizarxmlnosite");
+          iframe.src = iframe.src;
+        
+         	//CAPTURA DADOS DO INSTAGRAM DA ID=photos-Wrap E JOGA NO CAMPO
+ 
+	 dadosparatxt ='';
+     $("#bar li input").each(function() {
+         dadosparatxt += $(this).val();
+     }); 
+
+    //alert(dadosparatxt);
+	
+	 $('#campo1').val('<?xml version="1.0" encoding="utf-8"?><Pages>' + dadosparatxt +' </Pages>');
+        
+        $.ajax({
+           
+            type      : 'post',
+ 
+            url       : 'http://www.mesmeracomunicacao.com.br/eventogram/gerarxml_listabranca.php',
+ 
+            data      : 'nome='+ $('#campo1').val(),
+ 
+            dataType  : 'html',
+ 
+            success : function(txt){
+                    $('body p').html(txt);
+                 
+                },
+	
+	    complete: function() {
+         
+         modalspinner_desligado()
+		}
+        });
+     };
+ </script>    
+   
+    <script>
+    
+      function initPullToRefreshScroller(e) {
+       
+
+        var scroller = e.view.scroller;
+
+        scroller.setOptions({
+        
+            pullToRefresh: true,
+            pull: function() {
+           
+    
+               modalspinner_ligado(); 
+               var iframe = document.getElementById("atualizarxmlnosite");
+               iframe.src = iframe.src; 
+                    
+                $.ajax({
+			url: 'http://www.mesmeracomunicacao.com.br/eventogram/listanegra.xml',
+            type: 'GET',
+            dataType: 'xml',	
+			cache: false,
+ 		    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert("erro");
+        },
+		
+            success: function(d){
+		
+ 		
+		
+        	$(d).find('perfil').each(function(){
+
+            var $perfil = $(this); 
+            var username = $perfil.find('username').text();
+            var avatar = $perfil.find('avatar').text();
+            var url = $perfil.find('url').text();
+       
+            $('#foo').append('<li id="'+ username +'"><a data-role="button" data-rel="modalview"  href="#modal"><img src="' + avatar + '" width="50%"><span class="pefilname">' + username + '</span><input type="text" id="' + username + '" name="' + username + '"style="display:none;"  /></a></li>');
+            $('input[name="'+ username +'"]').val('<perfil id="'+ username +'"><username>'+ username +'</username><url>'+ url +'</url><avatar>'+ avatar +'</avatar></perfil>');
+           })			
+	    },
+            
+	    complete: function() {
+                
+                  var duplicateChk = {};
+
+		$('#foo li a [id]').each (function () {
+    		if (duplicateChk.hasOwnProperty(this.id)) {
+       		$(this).parent().parent().remove();
+    		} else {
+       		duplicateChk[this.id] = 'true';
+    		}
+		});
+            
+                
+       	   $.ajax({
+			url: 'http://www.mesmeracomunicacao.com.br/eventogram/listabranca.xml',
+            type: 'GET',
+            dataType: 'xml',	
+			cache: false,
+ 		    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert("erro");
+        },
+			
+            success: function(d){
+		
+ 		
+			
+        	$(d).find('perfil').each(function(){
+
+            var $perfil = $(this); 
+            var username = $perfil.find('username').text();
+            var avatar = $perfil.find('avatar').text();
+            var url = $perfil.find('url').text();
+       
+            $('#bar').append('<li id="'+ username +'"><a data-role="button" data-rel="modalview"  href="#modal"><img src="' + avatar + '" width="50%"><span class="pefilname">' + username + '</span><input type="text" id="' + username + '" name="' + username + '" style="display:none;"/></a></li>').html();
+	        $('input[name="'+ username +'"]').val('<perfil id="'+ username +'"><username>'+ username +'</username><url>'+ url +'</url><avatar>'+ avatar +'</avatar></perfil>');
+                })			
+	    },
+	
+	    complete: function() {
+            
+              var duplicateChk = {};
+
+		$('#bar li a [id]').each (function () {
+    		if (duplicateChk.hasOwnProperty(this.id)) {
+       		$(this).parent().parent().remove();
+    		} else {
+       		duplicateChk[this.id] = 'true';
+    		}
+		});
+            
+         iniciasortable();
+            
+         modalspinner_desligado();
+
+      setTimeout(function() { scroller.pullHandled(); }, 400);
+         
+		}
+	 });
+  
+            }
+                    
+      });
+                
+                
+                
+                
+            }
+       });
+    }
+            
+</script>
+    
+    
+</div>
+    
+

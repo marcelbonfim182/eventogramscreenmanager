@@ -7,23 +7,18 @@
     
     <link href="kendo/styles/kendo.mobile.all.min.css" rel="stylesheet" />
     <link href="styles/main.css" rel="stylesheet" />
+
  
 
     <script src="cordova.js"></script>
     <script src="kendo/js/jquery.min.js"></script>
-    
-    
-    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
-    <script src="scripts/jquery.ui.touch-punch.min.js"></script>          
-    
- 
-    
     <script src="kendo/js/kendo.mobile.min.js"></script>
 
     
 
     <script src="scripts/app.js"></script>
     <script type="text/javascript" src="scripts/jquery.profile-widget.min.js"></script>
+
 
 
    <script>
@@ -48,10 +43,7 @@
        
        
       
-       function iniciaajax(){
-       
-       var iframe = document.getElementById("atualizarxmlnosite");
-          iframe.src = iframe.src;
+       function iniciaajax(){  
 
 	   $.ajax({
 			url: 'http://www.mesmeracomunicacao.com.br/eventogram/listanegra.xml',
@@ -73,7 +65,7 @@
             var avatar = $perfil.find('avatar').text();
             var url = $perfil.find('url').text();
        
-            $('#foo').append('<li  id="'+ username +'"><a data-role="button" data-rel="modalview" href="#modal"><img src="' + avatar + '" width="50%"><span class="pefilname">' + username + '</span><input type="text" id="' + username + '" name="' + username + '"style="display:none;"  /></a></li>');
+            $('#foo').append('<li><a  data-role="button" data-rel="modalview" data-click="verperfil" class="verperfil" href="#modalview-login"><img src="' + avatar + '" width="50%"><span class="pefilname">' + username + '</span><input type="text" id="' + username + '" name="' + username + '"style="display:none;"  /></a></li>');
             $('input[name="'+ username +'"]').val('<perfil id="'+ username +'"><username>'+ username +'</username><url>'+ url +'</url><avatar>'+ avatar +'</avatar></perfil>');
            })			
 	    },
@@ -96,18 +88,72 @@
 
             var $perfil = $(this); 
             var username = $perfil.find('username').text();
+            var usernametai = "."+username;
             var avatar = $perfil.find('avatar').text();
             var url = $perfil.find('url').text();
        
-            $('#bar').append('<li id="'+ username +'"><a data-role="button" data-rel="modalview" href="#modal" ><img src="' + avatar + '" width="50%"><span class="pefilname">' + username + '</span><input type="text" id="' + username + '" name="' + username + '" style="display:none;"/></a></li>').html();
+            $('#bar').append('<li><a onclick="myFunction()"  data-role="button" data-rel="modalview" data-click="verperfil" class="verperfil" href="'+usernametai+'"><img src="' + avatar + '" width="50%"><span class="pefilname">' + username + '</span><input type="text" id="' + username + '" name="' + username + '" style="display:none;"/></a></li>').html();
 	        $('input[name="'+ username +'"]').val('<perfil id="'+ username +'"><username>'+ username +'</username><url>'+ url +'</url><avatar>'+ avatar +'</avatar></perfil>');
-        
+            $('#novoteste').append('<li><a onclick="myFunction()" data-role="button" data-rel="modalview" data-click="verperfil" class="verperfil" href="'+usernametai+'"><img src="' + avatar + '" width="50%"><span class="pefilname">' + username + '</span><input type="text" id="' + username + '" name="' + username + '" style="display:none;"/></a></li>').html();
                 })			
 	    },
 	
 	    complete: function() {
-         iniciasortable();
-         modalspinner_desligado();
+         
+         modalspinner_desligado()
+
+                setInterval(function() {
+             //ATUALIZA IFRAME   
+          var iframe = document.getElementById("atualizarxmlnosite");
+          iframe.src = iframe.src;
+        
+           $.ajax({
+			url: 'http://www.mesmeracomunicacao.com.br/eventogram/listanegra.xml',
+            type: 'GET',
+            dataType: 'xml',	
+			cache: false,
+ 		    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert("erro");
+        },
+			
+            success: function(d){
+		modalspinner2_ligado();
+ 		 //$('#foo li').remove();
+			
+        	$(d).find('perfil').each(function(){
+
+            var $perfil = $(this); 
+            var username = $perfil.find('username').text();
+            var avatar = $perfil.find('avatar').text();
+            var url = $perfil.find('url').text();
+          
+            $('#foo').append('<li><a data-role="button" data-rel="modalview" data-click="verperfil" class="verperfil" href="#modalview-login"><img src="' + avatar + '" width="50%"><span class="pefilname">' + username + '</span><input type="text" id="' + username + '" name="' + username + '"style="display:none;"  /></a></li>');
+            $('input[name="'+ username +'"]').val('<perfil id="'+ username +'"><username>'+ username +'</username><url>'+ url +'</url><avatar>'+ avatar +'</avatar></perfil>');
+           })			
+	    },
+            
+	    complete: function() {
+            
+            	var duplicateChk = {};
+
+		$('#foo [id]').each (function () {
+    		if (duplicateChk.hasOwnProperty(this.id)) {
+       		$(this).parent().parent().remove();
+    		} else {
+       		duplicateChk[this.id] = 'true';
+    		}
+		});
+            
+            
+         modalspinner2_desligado()
+         
+		}
+	});  
+           
+}, 240000);
+            
+            
+     
 		}
 	});
          
@@ -121,10 +167,25 @@
        
 </script>
     
+    <script type="text/javascript">
+   $(window).load(function() {     
+        (".verperfil").onclick = function () {
+            alert("hi  jaavscript");
+        };
+       });
+        
+	 function verperfil(){
+  
+		$("#widget").ProfileWidget({
+			username: "pconnor88",
+			clientID: "4f98fd5117e640959efcc8169e23ad45"
+		});   
+	};
+</script>
     
 </head>
 <body>
-
+ 
   <div class="modalspinner">  
      <div class="spinner">
       <div class="rect1"></div>
